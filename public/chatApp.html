@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat App</title>
+    <!-- Correctly load Socket.io client -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>One-to-One Chat</h1>
+    <div>
+        <input id="room" type="text" placeholder="Room ID">
+        <button onclick="joinRoom()">Join Room</button>
+    </div>
+    <div>
+        <input id="message" type="text" placeholder="Message">
+        <button onclick="sendMessage()">Send Message</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const socket = io({
+            withCredentials: true
+        }); 
+
+        function joinRoom() {
+            const room = document.getElementById('room').value;
+            socket.emit('join', room);
+            console.log(`Joined room: ${room}`);
+        }
+
+        function sendMessage() {
+            const room = document.getElementById('room').value;
+            const message = document.getElementById('message').value;
+            socket.emit('private_message', { room, message });
+            console.log(`Sent message to room ${room}: ${message}`);
+        }
+
+        socket.on('private_message', (message) => {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+            console.log(`Received message: ${message}`);
+        });
+    </script>
+</body>
+</html>
